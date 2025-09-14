@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'ciphersweet_key' => env('CIPHERSWEET_KEY', ''),
+
 ];
