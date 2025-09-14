@@ -19,6 +19,9 @@ return new class extends Migration
             $table->binary('card_number');
             $table->binary('cvv');
 
+            $table->string('amount_index')->index();
+            $table->string('card_number_index', 64)->index();
+
             $table->enum('type', ['withdrawal', 'deposit']);
             $table->text('description')->nullable();;
 
