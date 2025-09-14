@@ -22,7 +22,7 @@ return new class extends Migration
             // blind indexes for querying
             $table->string('account_number_index', 64)->unique();
             $table->string('ssn_index', 64)->index();
-            $table->string('balance_index', 64)->index();
+            $table->string('balance_index')->index();
 
             $table->timestamps();
         });
