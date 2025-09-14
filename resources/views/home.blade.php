@@ -21,13 +21,9 @@
             </style>
         @endif
     </head>
-    <body class="">
-        <div x-data="{ open: false }">
-            <button @click="open = !open">Expand</button>
-
-            <span x-show="open">
-                Content...
-            </span>
-        </div>
+    <body>
+        <main>
+            @yield('content')
+        </main>
     </body>
 </html>
