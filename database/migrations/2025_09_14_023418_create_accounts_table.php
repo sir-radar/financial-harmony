@@ -14,10 +14,16 @@ return new class extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
-            $table->string('account_number');
-            $table->text('balance');
-            $table->text('ssn');
+            $table->string('email', 191)->unique();
+            //encrypted
+            $table->binary('account_number') ;
+            $table->binary('balance');
+            $table->binary('ssn');
+            // blind indexes for querying
+            $table->string('account_number_index', 64)->unique();
+            $table->string('ssn_index', 64)->index();
+            $table->string('balance_index', 64)->index();
+
             $table->timestamps();
         });
     }
