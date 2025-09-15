@@ -1,61 +1,247 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Financial Harmony
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This Laravel application demonstrates **field-level encryption with searchable indexes** for sensitive data stored in a MySQL database.  
 
-## About Laravel
+This idea was taken from this [video](https://www.youtube.com/watch?v=UuknxVdqzb4&ab_channel=freeCodeCamp.org) on freeCodeCamp.org youtube channel.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+It replicates the idea of **MongoDB Client-Side Field-Level Encryption**:  
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Data is **encrypted before reaching the database**.  
+- The database never sees plaintext or keys.  
+- Special **blind indexes** allow equality queries (find by Account Number, SSN, Amount, etc.) without decrypting data on the server.  
+- Encryptions were done using [ciphersweet](https://github.com/paragonie/ciphersweet).
+For more in depth knowledge [see](https://ciphersweet.paragonie.com/)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🔐 Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Account Management**
+  - Create an account (name, email, account number, balance, SSN).
+  - Find account by **Account Number** (encrypted search).
+  - Find account by **SSN** (encrypted search).
+  - Find accounts by **Balance range** (bucketed/blind index search).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Transaction Management**
+  - Create transaction (amount, type, description, card number, CVV).
+  - Find transactions by **Account Number**.
+  - Find transactions by **Amount range**.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Encryption**
+  - Account fields encrypted: `account_number`, `balance`, `ssn`.
+  - Transaction fields encrypted: `amount`, `card_number`, `cvv`.
+  - Queries use **blind indexes** (deterministic HMAC tokens).
+  - Only Laravel decrypts data; MySQL stores ciphertext only.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## ⚙️ Requirements
 
-### Premium Partners
+- PHP 8.1+  
+- Laravel 10+  
+- Docker  
+- Composer  
+- Ciphersweet  
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 📦 Installation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Clone repo & install dependencies**
 
-## Code of Conduct
+```bash
+git clone https://github.com/sir-radar/finacial-harmony
+cd finacial-harmony
+composer install
+npm install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Environment setup**
 
-## Security Vulnerabilities
+Copy `.env.example` to `.env` and configure database:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=8001
+DB_DATABASE=encrypted_finance
+DB_USERNAME=finance
+DB_PASSWORD=encrypted
+```
 
-## License
+Add encryption keys (generate a random 32-byte key):
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+APP_KEY=base64:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+CIPHERSWEET_KEY=base64:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+```
+
+Use openssl in your terminal
+
+```bash
+ openssl rand -base64 32
+```
+
+Or
+
+> ⚠️ Use a secure random key from `php artisan tinker`:
+> ```php
+> base64_encode(random_bytes(32));
+> ```
+
+3. **Start Docker**
+
+```bash
+docker compose up -d
+```
+
+4. **Run migrations**
+
+```bash
+php artisan migrate
+```
+
+5. **Start App**
+
+```bash
+php artisan serve
+npm run dev
+```
+
+---
+
+## 🔐 How Encryption Works
+
+This app uses [ParagonIE CipherSweet](https://ciphersweet.paragonie.com/) under the hood.
+
+- **Ciphertext Columns**: Sensitive values are encrypted before saving (`account_number`, `balance`, `ssn`, etc.).
+- **Blind Index Columns**: For searchable fields, a deterministic HMAC-based index is stored alongside ciphertext.
+  - Example: searching for SSN `"123-45-6789"` → Laravel computes the blind index → MySQL matches `ssn_index`.
+  - Database never sees the plaintext or encryption key.
+- **Range Queries**: True range queries are not possible with blind indexes.
+  - Workaround: **bucketization** (e.g., store `balance_bucket = floor(balance/100)`) for efficient range lookups.
+
+---
+
+## 🗄️ Database Schema
+
+### `accounts` table
+
+| Column                | Type    | Notes                             |
+|------------------------|---------|----------------------------------|
+| `id`                  | BIGINT  | Primary key                      |
+| `name`                | VARCHAR | Plaintext                        |
+| `email`               | VARCHAR | Unique, plaintext                |
+| `account_number`      | BLOB    | Encrypted                        |
+| `account_number_index`| VARCHAR | Blind index (searchable)         |
+| `balance`             | BLOB    | Encrypted                        |
+| `balance_index`       | VARCHAR | Blind index (for equality/bucket)|
+| `ssn`                 | BLOB    | Encrypted                        |
+| `ssn_index`           | VARCHAR | Blind index                      |
+| `timestamps`          | ...     | Created/Updated                   |
+
+### `transactions` table
+
+| Column                | Type    | Notes                             |
+|------------------------|---------|----------------------------------|
+| `id`                  | BIGINT  | Primary key                      |
+| `account_id`          | BIGINT  | Foreign key → accounts.id        |
+| `amount`              | BLOB    | Encrypted                        |
+| `amount_index`        | VARCHAR | Blind index                      |
+| `card_number`         | BLOB    | Encrypted                        |
+| `card_number_index`   | VARCHAR | Blind index                      |
+| `cvv`                 | BLOB    | Encrypted                        |
+| `type`                | ENUM    | withdrawal / deposit             |
+| `description`         | TEXT    | Optional, plaintext              |
+| `timestamps`          | ...     | Created/Updated                   |
+
+---
+
+## 📖 API Usage
+
+### Create Account
+```http
+POST /accounts
+Content-Type: application/json
+
+{
+  "name": "Alice",
+  "email": "alice@example.com",
+  "account_number": "123456789012",
+  "balance": 5000.50,
+  "ssn": "123-45-6789"
+}
+```
+
+### Find Account by Number
+```http
+GET /accounts/number/123456789012
+```
+
+### Find Account by SSN
+```http
+GET /accounts/ssn/123-45-6789
+```
+
+### Find Accounts by Balance Range
+```http
+GET /accounts/balance/1000/5000
+```
+
+---
+
+### Create Transaction
+```http
+POST /transactions
+Content-Type: application/json
+
+{
+  "account_id": 1,
+  "amount": 200.00,
+  "type": "deposit",
+  "description": "Paycheck",
+  "card_number": "4111111111111111",
+  "cvv": "123"
+}
+```
+
+### Find Transactions by Account Number
+```http
+GET /transactions/account/123456789012
+```
+
+### Find Transactions by Amount Range
+```http
+GET /transactions/amount/100/500
+```
+
+---
+
+## ⚠️ Security Considerations
+
+- **Range queries**: true range queries over encrypted data are not possible without advanced cryptography (OPE/FHE). Used bucketization instead.  
+- **Key management**:  
+  - Do **not** hardcode keys in code.  
+  - Store in `.env` or use AWS KMS / HashiCorp Vault.  
+  - Rotate keys periodically.   
+
+---
+
+## 🧪 Development Notes
+
+- Models handle encryption/decryption automatically via accessors/mutators.  
+- Query helpers (`findByAccountNumber`, `findBySsn`, etc.) use blind indexes.  
+- Controllers expose JSON APIs for creating and searching accounts/transactions.  
+
+---
+
+## 🛡️ Future Improvements
+- Add **prefix blind indexes** for partial search (e.g., SSN prefix).  
+- Integrate with **Vault/KMS** for secure key management.  
+- Add **unit tests** for encryption/decryption and search.  
+
+---
+
+## 📜 License
+
+MIT License. Use at your own risk — **encryption in production systems requires careful key management and threat modeling.**
