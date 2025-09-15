@@ -70,7 +70,7 @@ class Account extends Model
     public static function findBySsn(string $ssn)
     {
         $index = app('crypto')->blindIndex('ssn', $ssn);
-        return static::where('ssn_index', $index)->first();
+        return static::where('ssn_index', $index)->firstOrFail();
     }
 
     public static function findByBalanceRange(float $min, float $max, int $size = 100)
