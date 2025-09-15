@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email', 191)->unique();
             //encrypted
-            $table->binary('account_number') ;
+            $table->binary('account_number');
             $table->binary('balance');
             $table->binary('ssn');
             // blind indexes for querying
