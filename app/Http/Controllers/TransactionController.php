@@ -50,7 +50,11 @@ class TransactionController extends Controller
 
     public function findByAccountNumber(string $accountNumber)
     {
-        return response()->json(Transaction::findByAccountNumber($accountNumber));
+        try {
+            return response()->json(Transaction::findByAccountNumber($accountNumber));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'No Transaction found'], 404);
+        }
     }
 
     public function findByAmountRange(float $min, float $max)
