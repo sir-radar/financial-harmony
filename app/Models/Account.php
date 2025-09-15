@@ -83,7 +83,7 @@ class Account extends Model
             $bucketKey = self::numberToBucket($bucket, $size);
             $buckets[] = app('crypto')->blindIndex('balance_bucket', $bucketKey);
         }
-        // 🚨 Prevent too many placeholders
+        // Prevent too many placeholders
         if (count($buckets) > 500) {
             // Fallback: scan in chunks of 500 buckets
             $results = collect();
