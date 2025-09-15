@@ -11,7 +11,9 @@
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify(body),
+                        ...(method === "POST"
+                            ? { body: JSON.stringify(body) }
+                            : ""),
                     });
 
                     if (!response.ok) {
@@ -31,6 +33,8 @@
 
                     $refs[ref].style.background = "#DCFCE7";
                     $refs[ref].style.color = "#166534";
+                    $refs[ref].style.padding = "1rem";
+                    $refs[ref].style.marginTop = "1rem";
                     $refs[ref].textContent = JSON.stringify(data, null, 2);
                 } catch (error) {
                     let message =
@@ -46,6 +50,8 @@
                     }
                     $refs[ref].style.background = "#FEE2E2";
                     $refs[ref].style.color = "red";
+                    $refs[ref].style.padding = "1rem";
+                    $refs[ref].style.marginTop = "1rem";
                     $refs[ref].textContent = JSON.stringify(
                         {
                             error: true,
