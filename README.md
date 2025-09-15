@@ -41,7 +41,8 @@ For more in depth knowledge [see](https://ciphersweet.paragonie.com/)
 - Laravel 10+  
 - Docker  
 - Composer  
-- Ciphersweet  
+- Ciphersweet 
+- AlpineJS
 
 ---
 
