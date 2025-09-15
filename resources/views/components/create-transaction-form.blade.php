@@ -1,13 +1,40 @@
-<div class="border rounded-lg p-6 shadow bg-gray-50">
+<div
+    x-data="{
+    account_number: '',
+    amount: '',
+    type: '',
+    description: '',
+    card_number: '',
+    cvv: '',
+    submit() {
+        $store.api.submitForm(
+                    'transactions',
+                    {
+                        type: this.type.toLowerCase(),
+                        description: this.description,
+                        amount: this.amount,
+                        card_number: this.card_number,
+                        cvv: this.cvv,
+                        account_number: this.account_number
+                    },
+                    $refs,
+                    'trans',
+                    'POST')
+    }
+    }"
+    class="border rounded-lg p-6 shadow bg-gray-50"
+>
     <h3 class="text-xl font-semibold mb-4">Create Transaction</h3>
-    <form class="space-y-4">
+    <form @submit.prevent="submit" class="space-y-4">
         <div>
             <label class="block text-sm font-medium"
                 >Account Number (Encrypted)</label
             >
             <input
-                type="text"
-                value="1234567890"
+                type="number"
+                name="account_number"
+                x-model="account_number"
+                :oninput="account_number.length > $store.api.ACCOUNT_NUMBER_LENGTH ? account_number = account_number.slice(0, $store.api.ACCOUNT_NUMBER_LENGTH) : account_number"
                 class="w-full mt-1 px-3 py-2 border rounded-lg"
             />
         </div>
@@ -17,13 +44,18 @@
             >
             <input
                 type="number"
-                value="1500"
+                name="amount"
+                x-model="amount"
                 class="w-full mt-1 px-3 py-2 border rounded-lg"
             />
         </div>
         <div>
             <label class="block text-sm font-medium">Transaction Type</label>
-            <select class="w-full mt-1 px-3 py-2 border rounded-lg">
+            <select
+                x-model="type"
+                name="type"
+                class="w-full mt-1 px-3 py-2 border rounded-lg"
+            >
                 <option>Withdrawal</option>
                 <option>Deposit</option>
             </select>
@@ -32,7 +64,8 @@
             <label class="block text-sm font-medium">Description</label>
             <input
                 type="text"
-                value="ATM withdrawal"
+                name="description"
+                x-model="description"
                 class="w-full mt-1 px-3 py-2 border rounded-lg"
             />
         </div>
@@ -41,24 +74,28 @@
                 >Card Number (Encrypted)</label
             >
             <input
-                type="text"
-                value="4111111111111111"
+                type="number"
+                name="card_number"
+                x-model="card_number"
                 class="w-full mt-1 px-3 py-2 border rounded-lg"
             />
         </div>
         <div>
             <label class="block text-sm font-medium">CVV (Encrypted)</label>
             <input
-                type="text"
-                value="123"
+                type="number"
+                name="cvv"
+                x-model="cvv"
+                :oninput="cvv.length > 3 ? cvv = cvv.slice(0, 3) : cvv"
                 class="w-full mt-1 px-3 py-2 border rounded-lg"
             />
         </div>
         <button
             type="submit"
-            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer"
         >
             Create Transaction
         </button>
     </form>
+    <pre x-ref="trans" style="padding: 0.5rem; margin-top: 1rem"></pre>
 </div>

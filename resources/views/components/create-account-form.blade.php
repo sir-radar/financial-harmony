@@ -40,6 +40,7 @@
             <input
                 type="number"
                 x-model="account_number"
+                :oninput="account_number.length > $store.api.ACCOUNT_NUMBER_LENGTH ? account_number = account_number.slice(0, $store.api.ACCOUNT_NUMBER_LENGTH) : account_number"
                 name="account_number"
                 class="w-full mt-1 px-3 py-2 border rounded-lg"
             />

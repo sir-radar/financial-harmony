@@ -24,7 +24,7 @@ class AccountCreationRequest extends FormRequest
         return [
             'name' => 'required',
             'email' => 'required|email|unique:accounts,email',
-            'account_number' => 'required|unique:accounts,account_number_index',
+            'account_number' => 'required|unique:accounts,account_number_index|max:10',
             'balance' => 'required|numeric',
             'ssn' => 'required',
         ];

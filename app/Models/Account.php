@@ -64,7 +64,7 @@ class Account extends Model
     public static function findByAccountNumber(string $number)
     {
         $index = app('crypto')->blindIndex('account_number', $number);
-        return static::where('account_number_index', $index)->first();
+        return static::where('account_number_index', $index)->firstOrFail();
     }
 
     public static function findBySsn(string $ssn)

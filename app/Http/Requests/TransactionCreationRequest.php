@@ -22,7 +22,7 @@ class TransactionCreationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_number' => 'required',
+            'account_number' => 'required|max:10',
             'amount' => 'required|numeric',
             'type' => 'required|in:withdrawal,deposit',
             'description' => 'nullable|string',

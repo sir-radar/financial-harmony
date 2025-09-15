@@ -2,7 +2,9 @@
 <script>
     document.addEventListener("alpine:init", () => {
         Alpine.store("api", {
+            ACCOUNT_NUMBER_LENGTH: 10,
             async submitForm(url, body, $refs, ref, method) {
+                let statusCode = 200;
                 try {
                     const response = await fetch(`/api/${url}`, {
                         method,
@@ -13,6 +15,7 @@
                     });
 
                     if (!response.ok) {
+                        statusCode = response.status;
                         // Try to parse JSON error details
                         let errorData;
                         try {
@@ -30,7 +33,10 @@
                     $refs[ref].style.color = "#166534";
                     $refs[ref].textContent = JSON.stringify(data, null, 2);
                 } catch (error) {
-                    let message = "Unexpected error occurred";
+                    let message =
+                        statusCode !== 422
+                            ? error.message
+                            : "Unexpected error occurred";
 
                     let validationMessages = [];
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TransactionCreationRequest;
 use App\Models\Account;
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
@@ -14,7 +15,11 @@ class TransactionController extends Controller
         $data = $request->validated();
 
 
-        $account = Account::findByAccountNumber($data['account_number'])->first();
+        try {
+            $account = Account::findByAccountNumber($data['account_number']);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Account number ' . $data['account_number'] . ' not found'], 404);
+        }
 
         $data['account_id'] = $account->id;
         unset($data['account_number']);
