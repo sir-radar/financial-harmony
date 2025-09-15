@@ -78,7 +78,8 @@
         <div class="bg-slate-800 text-white p-8 text-center">
             <h1 class="text-3xl font-bold">Financial Harmony</h1>
             <p class="mt-2 text-lg">
-                Secure Financial Transactions with MongoDB Queryable Encryption
+                Secure Financial Transactions with MySQL and Ciphersweet
+                Encryption
             </p>
         </div>
 
