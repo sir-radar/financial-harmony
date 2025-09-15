@@ -82,5 +82,5 @@
         </button>
     </form>
 
-    <pre x-ref="code" style="padding: 1rem; margin-top: 1rem"></pre>
+    <pre x-ref="code"></pre>
 </div>

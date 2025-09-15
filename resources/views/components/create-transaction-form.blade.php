@@ -97,5 +97,5 @@
             Create Transaction
         </button>
     </form>
-    <pre x-ref="trans" style="padding: 0.5rem; margin-top: 1rem"></pre>
+    <pre x-ref="trans"></pre>
 </div>
