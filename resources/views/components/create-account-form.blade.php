@@ -1,70 +1,29 @@
 <div
-    x-data="{ name: '',
+    x-data="{
+    name: '',
     account_number: '',
     balance: '',
     email: '',
     ssn: '',
-    async submitForm() {
-        try {
-            const response = await fetch('/api/accounts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: this.name,
-                    email: this.email,
-                    balance: this.balance,
-                    ssn: this.ssn,
-                    account_number: this.account_number
-                })
-            });
-
-            if (!response.ok) {
-                // Try to parse JSON error details
-                let errorData;
-                try {
-                    errorData = await response.json();
-                } catch {
-                    errorData = { message: await response.text() };
-                }
-
-                throw errorData;
-            }
-
-            const data = await response.json();
-
-            $refs.code.style.background = '#DCFCE7';
-            $refs.code.style.color = '#166534';
-            $refs.code.textContent = JSON.stringify(data, null, 2);
-        } catch (error) {
-            let message = 'Unexpected error occurred';
-
-            let validationMessages = [];
-
-            if (error.errors) {
-                // Flatten validation errors into a single array
-                validationMessages = Object.values(error.errors).flat();
-            }
-            $refs.code.style.background = '#FEE2E2';
-            $refs.code.style.color = 'red';
-            $refs.code.textContent = JSON.stringify(
-                {
-                    error: true,
-                    message,
-                    validation: validationMessages.length ? validationMessages : undefined
-                },
-                null,
-                2
-            );
-        }
+    submit() {
+        $store.api.submitForm(
+                    'accounts',
+                    {
+                        name: this.name,
+                        email: this.email,
+                        balance: this.balance,
+                        ssn: this.ssn,
+                        account_number: this.account_number
+                    },
+                    $refs,
+                    'code',
+                    'POST')
     }
-
 }"
     class="border rounded-lg p-6 shadow bg-gray-50"
 >
     <h3 class="text-xl font-semibold mb-4">Create Account</h3>
-    <form @submit.prevent="submitForm" class="space-y-4">
+    <form @submit.prevent="submit" class="space-y-4">
         <div>
             <label class="block text-sm font-medium">Customer Name</label>
             <input
