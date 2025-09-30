@@ -17,20 +17,14 @@ class AccountController extends Controller
 
     public function findByNumber(string $number)
     {
-        try {
-            return response()->json(Account::findByAccountNumber($number));
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Account number ' . $number . ' not found'], 404);
-        }
+
+        return response()->json(Account::findByAccountNumber($number));
     }
 
     public function findBySsn(string $ssn)
     {
-        try {
-            return response()->json(Account::findBySsn($ssn));
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Account with SSN ' . $ssn . ' not found'], 404);
-        }
+
+        return response()->json(Account::findBySsn($ssn));
     }
 
     public function findByBalanceRange(float $min, float $max)

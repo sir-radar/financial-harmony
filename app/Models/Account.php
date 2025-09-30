@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\AccountNotFoundException;
 use App\Traits\NumberBucket;
 use Illuminate\Database\Eloquent\Model;
 
@@ -64,13 +65,24 @@ class Account extends Model
     public static function findByAccountNumber(string $number)
     {
         $index = app('crypto')->blindIndex('account_number', $number);
-        return static::where('account_number_index', $index)->firstOrFail();
+        $account = static::where('account_number_index', $index)->first();
+        if (! $account) {
+            throw new AccountNotFoundException("Account number {$number} not found");
+        }
+
+        return $account;
     }
 
     public static function findBySsn(string $ssn)
     {
         $index = app('crypto')->blindIndex('ssn', $ssn);
-        return static::where('ssn_index', $index)->firstOrFail();
+        $account = static::where('ssn_index', $index)->first();
+
+        if (!$account) {
+            throw new AccountNotFoundException("Account with SSN {$ssn} not found");
+        }
+
+        return $account;
     }
 
     public static function findByBalanceRange(float $min, float $max, int $size = 100)
@@ -83,7 +95,7 @@ class Account extends Model
             $bucketKey = self::numberToBucket($bucket, $size);
             $buckets[] = app('crypto')->blindIndex('balance_bucket', $bucketKey);
         }
-        // Prevent too many placeholders
+        // Prevent too many items in bucket
         if (count($buckets) > 500) {
             // Fallback: scan in chunks of 500 buckets
             $results = collect();

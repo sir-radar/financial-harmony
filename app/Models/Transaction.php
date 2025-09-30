@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\TransactionNotFoundException;
 use App\Traits\NumberBucket;
 use Illuminate\Database\Eloquent\Model;
 
@@ -56,7 +57,13 @@ class Transaction extends Model
     public static function findByAccountNumber(string $accountNumber)
     {
         $account = Account::findByAccountNumber($accountNumber);
-        return $account ? static::where('account_id', $account->id)->get() : collect();
+        $transaction = static::where('account_id', $account->id)->first();
+
+        if (! $transaction) {
+            throw new TransactionNotFoundException("No Transaction found for {$accountNumber}");
+        }
+
+        return $transaction;
     }
 
     public static function findByAmountRange(float $min, float $max, $size = 100)
@@ -69,7 +76,7 @@ class Transaction extends Model
             $bucketKey = self::numberToBucket($bucket, $size);
             $buckets[] = app('crypto')->blindIndex('amount_bucket', $bucketKey);
         }
-        // 🚨 Prevent too many placeholders
+        // Prevent too many items in bucket
         if (count($buckets) > 500) {
             // Fallback: scan in chunks of 500 buckets
             $results = collect();

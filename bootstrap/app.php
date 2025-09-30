@@ -18,5 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (App\Exceptions\AccountNotFoundException $e, \Illuminate\Http\Request $request) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        });
+
+        $exceptions->render(function (App\Exceptions\InsufficientFundsException $e, \Illuminate\Http\Request $request) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        });
+
+        $exceptions->render(function (App\Exceptions\TransactionNotFoundException $e, $request) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        });
     })->create();

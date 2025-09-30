@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\InsufficientFundsException;
 use App\Http\Requests\TransactionCreationRequest;
 use App\Models\Account;
 use App\Models\Transaction;
@@ -14,12 +15,7 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
 
-
-        try {
-            $account = Account::findByAccountNumber($data['account_number']);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Account number ' . $data['account_number'] . ' not found'], 404);
-        }
+        $account = Account::findByAccountNumber($data['account_number']);
 
         $data['account_id'] = $account->id;
         unset($data['account_number']);
@@ -32,7 +28,7 @@ class TransactionController extends Controller
 
             if ($data['type'] === 'withdrawal') {
                 if ($account->balance < $amount) {
-                    throw new \RuntimeException('Insufficient funds.');
+                    throw new InsufficientFundsException('Insufficient funds.');
                 }
                 $account->balance = $account->balance - $amount;
             } else { // deposit
@@ -50,11 +46,8 @@ class TransactionController extends Controller
 
     public function findByAccountNumber(string $accountNumber)
     {
-        try {
-            return response()->json(Transaction::findByAccountNumber($accountNumber));
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'No Transaction found'], 404);
-        }
+
+        return response()->json(Transaction::findByAccountNumber($accountNumber));
     }
 
     public function findByAmountRange(float $min, float $max)
