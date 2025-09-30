@@ -1,12 +1,14 @@
 <?php
 
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/accounts', [App\Http\Controllers\AccountController::class, 'create']);
-Route::get('/accounts/number/{number}', [App\Http\Controllers\AccountController::class, 'findByNumber']);
-Route::get('/accounts/ssn/{ssn}', [App\Http\Controllers\AccountController::class, 'findBySsn']);
-Route::get('/accounts/balance/{min}/{max}', [App\Http\Controllers\AccountController::class, 'findByBalanceRange']);
+Route::post('/accounts', [AccountController::class, 'create']);
+Route::get('/accounts/number/{number}', [AccountController::class, 'findByNumber']);
+Route::get('/accounts/ssn/{ssn}', [AccountController::class, 'findBySsn']);
+Route::get('/accounts/balance/{min}/{max}', [AccountController::class, 'findByBalanceRange']);
 
-Route::post('/transactions', [App\Http\Controllers\TransactionController::class, 'create']);
-Route::get('/transactions/account/{accountNumber}', [App\Http\Controllers\TransactionController::class, 'findByAccountNumber']);
-Route::get('/transaction/amount/{min}/{max}', [App\Http\Controllers\TransactionController::class, 'findByAmountRange']);
+Route::post('/transactions', [TransactionController::class, 'create']);
+Route::get('/transactions/account/{accountNumber}', [TransactionController::class, 'findByAccountNumber']);
+Route::get('/transaction/amount/{min}/{max}', [TransactionController::class, 'findByAmountRange']);
